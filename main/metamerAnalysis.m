@@ -24,9 +24,7 @@ function params = metamerAnalysis(oim,m,opts)
 Nsc = opts.Nsc;
 Nor = opts.Nor;
 maxNa = opts.maxNa;
-Nx = opts.szy; % careful, flipping x and y here
-Ny = opts.szx;
-[Ny,Nx] = size(oim);
+[Ny,Nx] = size(oim); % careful, flipping x and y here
 
 % build complex steerable pyramid in the fourier domain
 [pyr0,pind0] = buildSCFpyr(oim,Nsc,Nor-1);
@@ -44,7 +42,7 @@ for imask=1:m.scale{1}.nMasks
   thisMaskNAN = thisMask;
   thisMaskNAN(thisMaskNAN==0) = NaN;
   thisMaskNAN(thisMaskNAN>0) = 1;
-  [mn0 mx0] = range2(oim.*thisMaskNAN);
+  [mn0, mx0] = range2(oim.*thisMaskNAN);
   mean0 = wmean2(oim,thisMask);
   var0 = wvar2(oim,thisMask);
   skew0 = wskew2(oim,thisMask);
@@ -53,8 +51,6 @@ for imask=1:m.scale{1}.nMasks
 end
 skew0p.total.full = skew2(oim);
 kurt0p.total.full = kurt2(oim);
-
-nband = size(pind0,1);
 
 % compute real parts and magnitudes of subbands
 rpyr0 = real(pyr0);
@@ -74,7 +70,7 @@ nband = size(pind0,1);
 ch = pyrBand(real(pyr0),pind0,nband);
 [mpyr,mpind] = buildSFpyr(real(ch),0,0);
 im = pyrBand(mpyr,mpind,2);
-[Nly Nlx] = size(ch);
+%[Nly, Nlx] = size(ch);
 
 if opts.verbose; fprintf('(metamerAnalysis) autocorrelation\n'); end
 % compute central autoCorr of lowband
@@ -87,7 +83,7 @@ for imask=1:m.scale{Nsc+1}.nMasks
   acr.scale{Nsc+1}.mask{imask} = ac;
   vari = ac(ceil(size(ac,1)/2),ceil(size(ac,1)/2));
   
-  if vari/var0 > 1e-6,
+  if vari/var0 > 1e-6
     skew0p.scale{Nsc+1}(imask) = wskew2(im,thisMask);
     kurt0p.scale{Nsc+1}(imask) = wkurt2(im,thisMask);
   else
@@ -100,33 +96,33 @@ kurt0p.total.scale{Nsc+1} = kurt2(im);
 
 % compute central autoCorr of each Mag band,
 % and the autoCorr of the combined (non-oriented) band.
-for nsc = Nsc:-1:1,
-  for nor = 1:Nor,
+for nsc = Nsc:-1:1
+  for nor = 1:Nor
     nband = (nsc-1)*Nor+nor+1;
     ch = pyrBand(apyr0,pind0,nband);
-    [Nly, Nlx] = size(ch);
+    %[Nly, Nlx] = size(ch);
     for imask=1:m.scale{nsc}.nMasks
       thisMask = squeeze(m.scale{nsc}.maskMat(imask,:,:));
       thisMaskSqrt = sqrt(thisMask/sum(thisMask(:)));
       thisInd = m.scale{m.bandToMaskScale(nband)}.ind(imask,:);
       thisNa = m.scale{m.bandToMaskScale(nband)}.Na(imask);
-      [ac acFull] = wacorr2(ch,thisMask,thisMaskSqrt,thisInd,thisNa,maxNa,0);
+      [ac, acFull] = wacorr2(ch,thisMask,thisMaskSqrt,thisInd,thisNa,maxNa,0);
       ace.scale{nsc}.ori{nor}.mask{imask} = ac;
       aceFull.scale{nsc}.ori{nor}.mask{imask} = acFull;
     end
   end
   
   % combine ori bands
-  bandNums = [1:Nor] + (nsc-1)*Nor+1;
+  bandNums = 1:Nor + (nsc-1)*Nor+1;
   ind1 = pyrBandIndices(pind0, bandNums(1));
   indN = pyrBandIndices(pind0, bandNums(Nor));
-  bandInds = [ind1(1):indN(length(indN))];
+  bandInds = ind1(1):indN(length(indN));
 
   % make fake pyramid, containing dummy hi, ori, lo
   fakePind = [pind0(bandNums(1),:);pind0(bandNums(1):bandNums(Nor)+1,:)];
   fakePyr = [zeros(prod(fakePind(1,:)),1);...
     rpyr0(bandInds); zeros(prod(fakePind(size(fakePind,1),:)),1);];
-  ch = reconSFpyr(fakePyr, fakePind, [1]);     % recon ori bands only
+  ch = reconSFpyr(fakePyr, fakePind, 1);     % recon ori bands only
   im = real(expand(im,2))/4;
   im = im + ch;
   for imask=1:m.scale{nsc}.nMasks
@@ -134,11 +130,11 @@ for nsc = Nsc:-1:1,
     thisInd = m.scale{m.bandToMaskScale(nband)}.ind(imask,:);
     thisNa = m.scale{m.bandToMaskScale(nband)}.Na(imask);
     thisMaskSqrt = sqrt(thisMask/sum(thisMask(:)));
-    [ac acFull] = wacorr2(im,thisMask,thisMaskSqrt,thisInd,thisNa,maxNa,0);
+    [ac, acFull] = wacorr2(im,thisMask,thisMaskSqrt,thisInd,thisNa,maxNa,0);
     acr.scale{nsc}.mask{imask} = ac;
     acrFull.scale{nsc}.mask{imask} = acFull;
     vari = ac(ceil(size(ac,1)/2),ceil(size(ac,1)/2));
-    if vari/var0 > 1e-6, % don't understand this check!
+    if vari/var0 > 1e-6 % don't understand this check!
       skew0p.scale{nsc}(imask) = wskew2(im,thisMask);
       kurt0p.scale{nsc}(imask) = wkurt2(im,thisMask);
     else
@@ -167,16 +163,16 @@ for nsc=1:Nsc+1
 end
 
 % compute the correlations
-for nsc = 1:Nsc,
+for nsc = 1:Nsc
   firstBnum = (nsc-1)*Nor+2;
   cousinSz = prod(pind0(firstBnum,:));
   ind = pyrBandIndices(pind0,firstBnum);
-  cousinInd = ind(1) + [0:Nor*cousinSz-1];
+  cousinInd = ind(1) + 0:Nor*cousinSz-1;
   
   if (nsc<Nsc)
     parents = zeros(cousinSz,Nor);
     rparents = zeros(cousinSz,Nor*2);
-    for nor=1:Nor,
+    for nor=1:Nor
       nband = (nsc-1+1)*Nor+nor+1;
       tmp = expand(pyrBand(pyr0, pind0, nband),2)/4;
       rtmp = real(tmp); itmp = imag(tmp);
@@ -197,13 +193,15 @@ for nsc = 1:Nsc,
   cousins = reshape(apyr0(cousinInd), [cousinSz Nor]);
   nc = size(cousins,2);   np = size(parents,2);
   
-  for imask = 1:m.scale{nsc}.nMasks;
+  for imask = 1:m.scale{nsc}.nMasks
     clear cousinstmp
     clear parentstmp
     thisMask = squeeze(m.scale{nsc}.maskMat(imask,:,:));
+    cousinstmp = zeros(size(cousins));
     for inc=1:nc
       cousinstmp(:,inc) = (cousins(:,inc) - wmean2(cousins(:,inc),vector(thisMask))).*sqrt(vector(thisMask)/sum(thisMask(:)));
     end
+    parentstmp = zeros(size(parents));
     for inp=1:np
       parentstmp(:,inp) = (parents(:,inp) - wmean2(parents(:,inp),vector(thisMask))).*sqrt(vector(thisMask)/sum(thisMask(:)));
     end
@@ -220,13 +218,15 @@ for nsc = 1:Nsc,
   cousins = reshape(real(pyr0(cousinInd)), [cousinSz Nor]);
   nrc = size(cousins,2);   nrp = size(rparents,2);
   
-  for imask = 1:m.scale{nsc}.nMasks;
+  for imask = 1:m.scale{nsc}.nMasks
     clear cousinstmp
     clear rparentstmp
     thisMask = squeeze(m.scale{nsc}.maskMat(imask,:,:));
+    cousinstmp = zeros(size(cousins));
     for inc=1:nc
       cousinstmp(:,inc) = (cousins(:,inc) - wmean2(cousins(:,inc),vector(thisMask))).*sqrt(vector(thisMask)/sum(thisMask(:)));
     end
+    rparentstmp = zeros(size(rparents));
     for inrp=1:nrp
       rparentstmp(:,inrp) = (rparents(:,inrp) - wmean2(rparents(:,inrp),vector(thisMask))).*sqrt(vector(thisMask)/sum(thisMask(:)));
     end
