@@ -85,7 +85,7 @@ if (any(vector(mod(pind0,2))))
 end
 
 if opts.verbose; fprintf('(metamerOpts) %g scales\n',opts.Nsc); end
-if opts.verbose; fprintf('(metamerOpts) %g orientaitons\n',opts.Nor); end
+if opts.verbose; fprintf('(metamerOpts) %g orientations\n',opts.Nor); end
 if opts.verbose; fprintf('(metamerOpts) %gx%g neighborhood\n',opts.maxNa,opts.maxNa); end
 
 opts.windows.windowType = windowType;
