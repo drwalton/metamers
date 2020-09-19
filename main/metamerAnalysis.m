@@ -70,7 +70,6 @@ nband = size(pind0,1);
 ch = pyrBand(real(pyr0),pind0,nband);
 [mpyr,mpind] = buildSFpyr(real(ch),0,0);
 im = pyrBand(mpyr,mpind,2);
-%[Nly, Nlx] = size(ch);
 
 if opts.verbose; fprintf('(metamerAnalysis) autocorrelation\n'); end
 % compute central autoCorr of lowband
@@ -100,7 +99,6 @@ for nsc = Nsc:-1:1
   for nor = 1:Nor
     nband = (nsc-1)*Nor+nor+1;
     ch = pyrBand(apyr0,pind0,nband);
-    %[Nly, Nlx] = size(ch);
     for imask=1:m.scale{nsc}.nMasks
       thisMask = squeeze(m.scale{nsc}.maskMat(imask,:,:));
       thisMaskSqrt = sqrt(thisMask/sum(thisMask(:)));
@@ -113,7 +111,7 @@ for nsc = Nsc:-1:1
   end
   
   % combine ori bands
-  bandNums = 1:Nor + (nsc-1)*Nor+1;
+  bandNums = (1:Nor) + (nsc-1)*Nor+1;
   ind1 = pyrBandIndices(pind0, bandNums(1));
   indN = pyrBandIndices(pind0, bandNums(Nor));
   bandInds = ind1(1):indN(length(indN));
@@ -167,7 +165,7 @@ for nsc = 1:Nsc
   firstBnum = (nsc-1)*Nor+2;
   cousinSz = prod(pind0(firstBnum,:));
   ind = pyrBandIndices(pind0,firstBnum);
-  cousinInd = ind(1) + 0:Nor*cousinSz-1;
+  cousinInd = ind(1) + (0:Nor*cousinSz-1);
   
   if (nsc<Nsc)
     parents = zeros(cousinSz,Nor);

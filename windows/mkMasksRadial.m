@@ -1,4 +1,4 @@
-function [mask sz] = mkMasksRadial(imSize,windows,verbose)
+function [mask, sz] = mkMasksRadial(imSize,windows,verbose)
 
 %
 %-----------------------------------------
@@ -59,6 +59,7 @@ thetaCenters = (0:nThetas-1)*(thetaWidth+thetaTWidth)-thetaWidth/2;
 %(2.^(rCenters+rWidth/2)-2.^(rCenters-rWidth/2))./((2*pi*2.^rCenters)/nThetas)s
 
 imask = 1;
+mask = zeros(nThetas*nRs, imSize(1), imSize(2));
 if verbose; T = textWaitbar('(mkMasksRadial) making windows'); end
 for itheta=1:nThetas
 	[xThetaWin yThetaWin] = mkWinFunc(thetaCenters(itheta),thetaWidth,thetaTWidth,[0 2*pi],1);
@@ -82,5 +83,5 @@ for itheta=1:nThetas
 	end
 	if verbose; T = textWaitbar(T,itheta/nThetas); end
 end
-
+mask = mask(1:imask-1, :, :);
 mask(isnan(mask)) = 0;

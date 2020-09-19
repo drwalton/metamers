@@ -36,6 +36,10 @@ case 'square'
     thisSz = scales(1,:);
     m.scale{1}.size = [thisSz(2), thisSz(1)];
     m.scale{1}.maskMat = mkMasksSquare(thisSz,opts.windows,opts.verbose);
+case 'radialEquirectangular'
+    thisSz = scales(1,:);
+    m.scale{1}.size = [thisSz(2), thisSz(1)];
+    m.scale{1}.maskMat = mkMasksRadialEquirectangular(thisSz,opts.windows,opts.verbose);
 end
 m.scale{1}.nMasks = size(m.scale{1}.maskMat,1);
 
@@ -58,6 +62,9 @@ end
 for insc=1:Nsc+1
     m.scale{insc}.nMasks = m.scale{1}.nMasks;
     for imask=1:m.scale{insc}.nMasks
+        if nnz(squeeze(m.scale{insc}.maskMat(imask,:,:))) == 0
+            print('a');
+        end
         [indices minBoundBox numNonZero] = findZeros(squeeze(m.scale{insc}.maskMat(imask,:,:)));
         m.scale{insc}.ind(imask,:) = indices;
         m.scale{insc}.sz(imask) = numNonZero;

@@ -100,6 +100,15 @@ case 'radial'
     opts.windows.origin = [(opts.szx+1)/2 (opts.szy+1)/2];
   end
   opts.saveFile = sprintf('%gx%g_s%g_a%g_o%g',opts.szx,opts.szy,opts.windows.scale,opts.windows.aspect,opts.windows.overlap);
+case 'radialEquirectangular'
+  opts.windows.scale = scale;
+  opts.windows.aspect = aspect;
+  opts.windows.centerRadPerc = centerRadPerc;
+  opts.windows.origin = origin;
+  if isempty(opts.windows.origin)
+    opts.windows.origin = [(opts.szy+1)/2 (opts.szx+1)/2];
+  end
+  opts.saveFile = sprintf('%gx%g_s%g_a%g_o%g',opts.szx,opts.szy,opts.windows.scale,opts.windows.aspect,opts.windows.overlap);
 case 'square'
   opts.windows.nSquares = nSquares;
   opts.saveFile = sprintf('%gx%g_s%gx%g_o%g',opts.szx,opts.szy,opts.windows.nSquares(1),opts.windows.nSquares(2),opts.windows.overlap);

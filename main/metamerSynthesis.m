@@ -134,7 +134,7 @@ for nsc=Nsc:-1:1
   end
 end
 for nsc=Nsc:-1:1
-  bandNums = 1:Nor + (nsc-1)*Nor+1;
+  bandNums = (1:Nor) + (nsc-1)*Nor+1;
   ind1 = pyrBandIndices(oimpind, bandNums(1));
   indN = pyrBandIndices(oimpind, bandNums(Nor));
   bandInds = ind1(1):indN(length(indN));

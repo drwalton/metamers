@@ -1,8 +1,8 @@
-function [mask sz] = mkMasksRadialEquirectangular(imSize,windows,verbose)
+function [mask, sz] = mkMasksRadialEquirectangular(imSize,windows,verbose)
 
 %
 %-----------------------------------------
-% mask = mkMasksRadial(imSize,windows)
+% mask = mkMasksRadialEquirectangular(imSize,windows)
 %
 % generates a family of radial window functions
 % that tile evenly in angle and log eccentricity
@@ -33,8 +33,8 @@ overlap = [windows.overlap, windows.overlap];
 centerRad = round(windows.centerRadPerc*(sqrt(prod(imSize))/2));
 
 % create angle and distance matrices
-thetaVals = mkAngle(imSize,0,origin)+pi; % define from 0 to 2pi
-rVals = mkR(imSize,1,origin);
+[rVals, thetaVals] = mkRAndAngleEquirectangular(imSize, 0, origin, 1); 
+thetaVals = thetaVals + pi; % define from 0 to 2pi
 thetaVals(thetaVals==0) = 0.001;
 rVals(rVals == 0) = 0.001;
 
@@ -60,7 +60,7 @@ thetaCenters = (0:nThetas-1)*(thetaWidth+thetaTWidth)-thetaWidth/2;
 
 %ratio =
 %(2.^(rCenters+rWidth/2)-2.^(rCenters-rWidth/2))./((2*pi*2.^rCenters)/nThetas)s
-
+mask = zeros(nThetas*nRs, imSize(1), imSize(2));
 imask = 1;
 if verbose; T = textWaitbar('(mkMasksRadial) making windows'); end
 for itheta=1:nThetas
@@ -77,7 +77,7 @@ for itheta=1:nThetas
 
 		testMat = thetaMask.*rMask;
 		testMat(isnan(testMat)) = 0;
-		if ~isequal(testMat,zeros(size(thetaMask)))
+		if nnz(testMat) > 0;%~isequal(testMat,zeros(size(thetaMask)))
 			mask(imask,:,:) = testMat;
 			sz(imask) = (2^(rCenters(ir)+rWidth+rTWidth) - 2^(rCenters(ir)-rWidth-rTWidth));
 			imask = imask + 1;
@@ -86,4 +86,5 @@ for itheta=1:nThetas
 	if verbose; T = textWaitbar(T,itheta/nThetas); end
 end
 
+mask = mask(1:imask-1, :, :);
 mask(isnan(mask)) = 0;
