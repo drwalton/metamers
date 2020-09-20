@@ -84,12 +84,12 @@ end
 % extract parameters
 Nsc = opts.Nsc;
 Nor = opts.Nor;
-mean0 = zeros(m.scale{1}.nMasks);
-var0 = zeros(m.scale{1}.nMasks);
-skew0 = zeros(m.scale{1}.nMasks);
-kurt0 = zeros(m.scale{1}.nMasks);
-mn0 = zeros(m.scale{1}.nMasks);
-mx0 = zeros(m.scale{1}.nMasks);
+mean0 = zeros(m.scale{1}.nMasks,1);
+var0 = zeros(m.scale{1}.nMasks,1);
+skew0 = zeros(m.scale{1}.nMasks,1);
+kurt0 = zeros(m.scale{1}.nMasks,1);
+mn0 = zeros(m.scale{1}.nMasks,1);
+mx0 = zeros(m.scale{1}.nMasks,1);
 for iw = 1:m.scale{1}.nMasks
   statg0 = params.pixelStats(:,iw);
   mean0(iw) = statg0(1);
@@ -111,7 +111,7 @@ C0 = params.cousinMagCorr;
 Cr0 = params.cousinRealCorr;
 Cx0 = params.parentMagCorr;
 Crx0 = params.parentRealCorr;
-nW = zeros(Nsc+1);
+nW = zeros(Nsc+1,1);
 for nsc=1:Nsc+1
   nW(nsc) = m.scale{nsc}.nMasks;
   skew0p.scale{nsc} = clip(skew0p.scale{nsc},-4,4);
