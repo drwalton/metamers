@@ -59,6 +59,7 @@ if ieNotDefined('scale'); scale = 0.5; end
 if ieNotDefined('overlap'); overlap = 0.5; end
 if ieNotDefined('centerRadPerc'); centerRadPerc = 0.025; end
 if ieNotDefined('origin'); origin = []; end
+if ieNotDefined('subIm'); subIm = []; end
 
 opts.outputPath = outputPath;
 opts.nIters = nIters;
@@ -72,6 +73,8 @@ opts.szy = size(oim,1);
 opts.Nsc = Nsc;
 opts.Nor = Nor;
 opts.maxNa = Na;
+opts.subIm = subIm;
+    
 
 if opts.Nsc < 3 || opts.Nsc > 5
   error('(metamerOpts) only 3,4, or 5 scales supported');

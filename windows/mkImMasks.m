@@ -20,8 +20,12 @@ Nsc = opts.Nsc;
 Nor = opts.Nor;
 maxNa = opts.maxNa;
 
-% build dummy steerable pyramid
-[pyr0,pind0] = buildSCFpyr(zeros(opts.szy,opts.szx),Nsc,Nor-1);
+% build dummy steerable pyramid  
+if isempty(opts.subIm)
+    [pyr0,pind0] = buildSCFpyr(zeros(opts.szy,opts.szx),Nsc,Nor-1);
+else
+    [pyr0,pind0] = buildSCFpyr(zeros(1+opts.subIm(2)-opts.subIm(1), 1+opts.subIm(4)-opts.subIm(3)), Nsc, Nor-1);
+end
 
 % get scales
 scales = pind0(2:Nor:end,:);
@@ -37,9 +41,15 @@ case 'square'
     m.scale{1}.size = [thisSz(2), thisSz(1)];
     m.scale{1}.maskMat = mkMasksSquare(thisSz,opts.windows,opts.verbose);
 case 'radialEquirectangular'
-    thisSz = scales(1,:);
-    m.scale{1}.size = [thisSz(2), thisSz(1)];
-    m.scale{1}.maskMat = mkMasksRadialEquirectangular(thisSz,opts.windows,opts.verbose);
+    thisSz = [opts.szy, opts.szx];
+    
+    if isempty(opts.subIm)
+        m.scale{1}.maskMat = mkMasksRadialEquirectangular(thisSz,opts.windows,opts.verbose);
+        m.scale{1}.size = [thisSz(2), thisSz(1)];
+    else
+        m.scale{1}.maskMat = mkMasksRadialEquirectangular(thisSz,opts.windows,opts.verbose, opts.subIm);
+        m.scale{1}.size = [1+opts.subIm(2)-opts.subIm(1), 1+opts.subIm(4)-opts.subIm(3)];
+    end
 end
 m.scale{1}.nMasks = size(m.scale{1}.maskMat,1);
 

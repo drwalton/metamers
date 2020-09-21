@@ -1,11 +1,13 @@
-% IM = mkAngle(SIZE, PHASE, ORIGIN)
+% rIm, angleIm = mkRAndAngleEquirectangular(SIZE, PHASE, ORIGIN)
 %
-% Compute a matrix of dimension SIZE (a [Y X] 2-vector, or a scalar)
-% containing samples of the roll angle (in radians) of each point in 
-% an equirectangular 360 image relative to the given origin point.
+% Compute matrices of dimension SIZE (a [Y X] 2-vector, or a scalar)
+% containing samples of the spherical distance and roll angle (in radians) 
+% of each point in an equirectangular 360 image relative to the given origin point.
 %
 % Note that the supplied origin point should be a pixel location, not 
 % spherical angles.
+%
+% The ra
 
 function [rIm, angleIm] = mkRAndAngleEquirectangular(sz,phase,origin,exponent)
 

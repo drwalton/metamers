@@ -21,7 +21,7 @@ if ieNotDefined('vals'); vals = ones(nMasks,1); end
 vals = vals(:)/max(vals(:));
 clrs = bsxfun(@times,ones(nMasks,3),vals);
 
-im = zeros(opts.szy,opts.szx,3);
+im = zeros(size(m.scale{1}.maskMat, 2),size(m.scale{1}.maskMat, 3),3);
 for imask = 1:nMasks
 	tmp = squeeze(m.scale{1}.maskMat(imask,:,:));
 	tmp2 = zeros(size(tmp));

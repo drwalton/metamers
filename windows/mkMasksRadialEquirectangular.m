@@ -1,4 +1,4 @@
-function [mask, sz] = mkMasksRadialEquirectangular(imSize,windows,verbose)
+function [mask, sz] = mkMasksRadialEquirectangular(imSize,windows,verbose, subIm)
 
 %
 %-----------------------------------------
@@ -13,6 +13,13 @@ function [mask, sz] = mkMasksRadialEquirectangular(imSize,windows,verbose)
 % imSize: size of image (2-vector)
 % windows: structure containing window parameters
 % (see initParams.m)
+% 
+% subIm is an optional parameter used when you want to generate windowing
+% functions for just a small sub-image within the equirectangular image.
+% Typically this would be a region around the focal point. If not supplied,
+% windows will be generated for the whole image. This should be a vector of
+% 4 indices such that im(subIm(1):subIm(2), subIm(3):subIm(4)) extracts the
+% region of the image you want.
 %
 % masks: matrix of window functions
 % sz: vector of window sizes
@@ -34,11 +41,18 @@ centerRad = round(windows.centerRadPerc*(sqrt(prod(imSize))/2));
 
 % create angle and distance matrices
 [rVals, thetaVals] = mkRAndAngleEquirectangular(imSize, 0, origin, 1); 
+
+if exist('subIm') ~= 0
+    rVals = rVals(subIm(1):subIm(2), subIm(3):subIm(4));
+    thetaVals = thetaVals(subIm(1):subIm(2), subIm(3):subIm(4));
+    imSize = size(rVals);
+end
+
 thetaVals = thetaVals + pi; % define from 0 to 2pi
 thetaVals(thetaVals==0) = 0.001;
 rVals(rVals == 0) = 0.001;
 
-% distance computaitons
+% distance computations
 centerRad = log2(centerRad);
 tmp = 2*log2((scale+sqrt(scale^2+4))/2);
 rTWidth = overlap(2)*tmp;
