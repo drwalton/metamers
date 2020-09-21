@@ -84,12 +84,6 @@ end
 % extract parameters
 Nsc = opts.Nsc;
 Nor = opts.Nor;
-mean0 = zeros(m.scale{1}.nMasks,1);
-var0 = zeros(m.scale{1}.nMasks,1);
-skew0 = zeros(m.scale{1}.nMasks,1);
-kurt0 = zeros(m.scale{1}.nMasks,1);
-mn0 = zeros(m.scale{1}.nMasks,1);
-mx0 = zeros(m.scale{1}.nMasks,1);
 for iw = 1:m.scale{1}.nMasks
   statg0 = params.pixelStats(:,iw);
   mean0(iw) = statg0(1);
@@ -111,7 +105,6 @@ C0 = params.cousinMagCorr;
 Cr0 = params.cousinRealCorr;
 Cx0 = params.parentMagCorr;
 Crx0 = params.parentRealCorr;
-nW = zeros(Nsc+1,1);
 for nsc=1:Nsc+1
   nW(nsc) = m.scale{nsc}.nMasks;
   skew0p.scale{nsc} = clip(skew0p.scale{nsc},-4,4);
@@ -134,10 +127,10 @@ for nsc=Nsc:-1:1
   end
 end
 for nsc=Nsc:-1:1
-  bandNums = (1:Nor) + (nsc-1)*Nor+1;
+  bandNums = [1:Nor] + (nsc-1)*Nor+1;
   ind1 = pyrBandIndices(oimpind, bandNums(1));
   indN = pyrBandIndices(oimpind, bandNums(Nor));
-  bandInds = ind1(1):indN(length(indN));
+  bandInds = [ind1(1):indN(length(indN))];
   fakePind = [oimpind(bandNums(1),:);oimpind(bandNums(1):bandNums(Nor)+1,:)];
   fakePyr = [zeros(prod(fakePind(1,:)),1);...
     roimpyr(bandInds); zeros(prod(fakePind(size(fakePind,1),:)),1);];
@@ -375,6 +368,7 @@ for niter=1:opts.nIters
       
       nband = (nsc-1)*Nor+nor+1;
       ch = pyrBand(apyr,pind,nband);
+      [Nly Nlx] = size(ch);
       
       % add in original magnitudes
       ch = ch.*W.full{nsc} + oim.mag.scale{nsc}.or{nor}.*(1-W.full{nsc});
@@ -486,7 +480,7 @@ for niter=1:opts.nIters
     ctr = ceil((dims+0.5)/2);
     ang = mkAngle(dims, 0, ctr);
     ang(ctr(1),ctr(2)) = -pi/2;
-    for nor = 1:Nor
+    for nor = 1:Nor,
       nband = (nsc-1)*Nor+nor+1;
       ind = pyrBandIndices(pind,nband);
       ch = pyrBand(pyr, pind, nband);
@@ -502,10 +496,10 @@ for niter=1:opts.nIters
     end
     
     % combine ori bands
-    bandNums = 1:Nor + (nsc-1)*Nor+1;  %ori bands only
+    bandNums = [1:Nor] + (nsc-1)*Nor+1;  %ori bands only
     ind1 = pyrBandIndices(pind, bandNums(1));
     indN = pyrBandIndices(pind, bandNums(Nor));
-    bandInds = ind1(1):indN(length(indN));
+    bandInds = [ind1(1):indN(length(indN))];
     %% Make fake pyramid, containing dummy hi, ori, lo
     fakePind = pind([bandNums(1), bandNums, bandNums(Nor)+1],:);
     fakePyr = [zeros(prod(fakePind(1,:)),1);...
@@ -522,6 +516,8 @@ for niter=1:opts.nIters
     clear kurtSNR
     clear targetMeans
     clear targetVars
+    
+    [Nly Nlx] = size(im);
     
     im = vector(im);
     
@@ -576,7 +572,7 @@ for niter=1:opts.nIters
     if nsc>1
 
       for niterw=1:NiterSkew
-        [im, skip] = wmodskew2(im,targetSkew,W.scale{nsc},W.sum{nsc},1,epPixSkew(nsc),nsc);
+        [im skip] = wmodskew2(im,targetSkew,W.scale{nsc},W.sum{nsc},1,epPixSkew(nsc),nsc);
         im = wmodmean2(im,targetMeans,W.scale{nsc},preCalcInv);
         if opts.debugging
           for iw=1:nW(nsc)
@@ -589,7 +585,7 @@ for niter=1:opts.nIters
       end
       
       for niterw=1:NiterKurt
-        [im, skip] = wmodkurt2(im,targetKurt,W.scale{nsc},W.sum{nsc},1,epPixKurt(nsc),nsc);
+        [im skip] = wmodkurt2(im,targetKurt,W.scale{nsc},W.sum{nsc},1,epPixKurt(nsc),nsc);
         im = wmodmean2(im,targetMeans,W.scale{nsc},preCalcInv);
         if opts.debugging
           for iw=1:nW(nsc)
@@ -664,9 +660,6 @@ for niter=1:opts.nIters
   targetMeans = mean0;
   preCalcInv = pinv(W.scale{1}'*W.scale{1});
   
-  meanSNR = zeros(nW(1), 20);
-  varSNR = zeros(nW(1), 20);
-  
   for niterw=1:20
     
     im = wmodvar2(im,targetVars,W.scale{1},W.sum{1},1,epPixVar);
@@ -688,7 +681,7 @@ for niter=1:opts.nIters
   end
 
   for niterw=1:NiterSkew
-    [im, skip] = wmodskew2(im,targetSkew,W.scale{1},W.sum{nsc},1,epPixSkew(nsc),1);
+    [im skip] = wmodskew2(im,targetSkew,W.scale{1},W.sum{nsc},1,epPixSkew(nsc),1);
     im = wmodmean2(im,targetMeans,W.scale{1},preCalcInv);
     if opts.debugging
       for iw=1:nW(1)
@@ -703,7 +696,7 @@ for niter=1:opts.nIters
   end
   
   for niterw=1:NiterKurt
-    [im, skip] = wmodkurt2(im,targetKurt,W.scale{1},W.sum{nsc},1,epPixKurt(nsc),1);
+    [im skip] = wmodkurt2(im,targetKurt,W.scale{1},W.sum{nsc},1,epPixKurt(nsc),1);
     im = wmodmean2(im,targetMeans,W.scale{1},preCalcInv);
     if opts.debugging
       for iw=1:nW(1)
@@ -802,7 +795,7 @@ for niter=1:opts.nIters
     end
     
     
-    for iband=1:size(oimpind,1)
+    for iband=1:size(oimpind,1);
       for iw=1:size(tmpparams.synthesis.magMeans.band{iband},1)
         tmpSignal = tmpparams.synthesis.magMeans.band{iband}(iw);
         signal = magMeans0.band{iband}(iw);
