@@ -7,14 +7,23 @@
 % This version only generates a metamer for a sub-image around the focal
 % point, allowing it to handle higher-resolution inputs.
 
-% load original image
-oim = double(imread('passau.png'));
-origin = (size(oim) + 1) ./ 2;
+function makeMetamer360SubIm(oim, origin, outputFilename)
+
+
+%Adding this for now as otherwise the 
+assert(isequal(size(oim),[1024, 2048]));
+%origin = (size(oim) + 1) ./ 2;
 
 %find coords of subIm to extract
-subImW = 512;
-subImH = 512;
-subIm = [origin(1)-(subImH/2), origin(1)+(subImH/2)-1, origin(2)-(subImW/2), origin(2)+(subImW/2)-1];
+subImW = 1024;
+subImH = 1024;
+%This version extracts a sub-image centred on the origin point.
+%subIm = [origin(1)-(subImH/2)+1, origin(1)+(subImH/2), origin(2)-(subImW/2)+1, origin(2)+(subImW/2)];
+
+%This alternative version centres it horizontally only, just capturing the
+%full vertical extent of the image.
+subIm = [1, 1024,  origin(2)-(subImW/2)+1, origin(2)+(subImW/2)];
+
 subIm = floor(subIm);
 
 %Extract sub-image
@@ -22,7 +31,9 @@ subOim = oim(subIm(1):subIm(2), subIm(3):subIm(4));
 assert(isequal(size(subOim), [subImH, subImW]));
 
 % set options
-opts = metamerOpts(oim,'windowType=radialEquirectangular','scale=0.5','aspect=2', strcat('subIm=', mat2str(subIm)));
+opts = metamerOpts(oim,'windowType=radialEquirectangular','scale=0.5', ...
+    'aspect=2', 'nIters=25', strcat('subIm=', mat2str(subIm)), ...
+    strcat('origin=', mat2str(origin)));
 
 % make windows
 m = mkImMasks(opts);
@@ -40,4 +51,4 @@ res = metamerSynthesis(params,size(subOim),m,opts);
 metamer = oim;
 metamer(subIm(1):subIm(2), subIm(3):subIm(4)) = res;
 
-imwrite(metamer/255, 'outputMetamer.png');
+imwrite(metamer/255, outputFilename);
