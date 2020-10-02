@@ -1,4 +1,5 @@
-oim = rgb2gray(double(imread('diff.bmp')));
+%oim = rgb2gray(double(imread('diff.bmp')));
+oim = double(imread('example-im-512x512.png'));
 
 %Generate initial output noise image.
 im_mean = mean2(oim);
