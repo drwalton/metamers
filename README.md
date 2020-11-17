@@ -9,3 +9,6 @@ see `contents.m` for what's in here and `metamerTest.m` for testing basic functi
 
 written in matlab a long time ago, could probably be greatly improved or enhanced using more modern tools!
 
+## Generation
+
+`main/generateMetamer.m` contains code to generate a single 2D metameric image using the parameters from the paper.
