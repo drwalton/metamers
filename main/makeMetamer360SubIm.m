@@ -7,8 +7,7 @@
 % This version only generates a metamer for a sub-image around the focal
 % point, allowing it to handle higher-resolution inputs.
 
-function makeMetamer360SubIm(oim, origin, outputFilename)
-
+function makeMetamer360SubIm(oim, origin, outputFilename, initIm)
 
 %Adding this for now as otherwise the 
 assert(isequal(size(oim),[1024, 2048]));
@@ -45,7 +44,12 @@ plotWindows(m,opts);
 params = metamerAnalysis(subOim,m,opts);
 
 % do metamer synthesis (generate new image matched for statistics)
-res = metamerSynthesis(params,size(subOim),m,opts);
+if exist('initIm') == 0
+    res = metamerSynthesis(params,size(subOim),m,opts);
+else
+    subInitIm = initIm(subIm(1):subIm(2), subIm(3):subIm(4));
+    res = metamerSynthesis(params,subInitIm,m,opts);
+end
 
 % Plug the generated metamer back into the original image
 metamer = oim;

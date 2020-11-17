@@ -10,7 +10,12 @@ angleStepSize = deg2rad(1);
 pixelStepSize = 2048 * (angleStepSize/(2*pi));
 
 %for i = -20:1:20
-for i = 0:20
+for i = 1:20
+    if isfile(sprintf('metamerAngle%d.png', i))
+        continue
+    end
+    prevIm = double(imread(sprintf('metamerAngle%d.png', i-1)));
+    
     originX = 1024.5 + (pixelStepSize*i);
-    makeMetamer360SubIm(oim, [originY,originX], sprintf('metamerAngle%d.png', i));
+    makeMetamer360SubIm(oim, [originY,originX], sprintf('metamerAngle%d.png', i), prevIm);
 end
