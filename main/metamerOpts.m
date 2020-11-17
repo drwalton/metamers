@@ -84,7 +84,7 @@ end
 
 % check to make sure all bands are even
 if (any(vector(mod(pind0,2))))
-  error('(metamerOpts) model will fail because some bands have odd dimensions');
+  warning('(metamerOpts) model will fail because some bands have odd dimensions');
 end
 
 if opts.verbose; fprintf('(metamerOpts) %g scales\n',opts.Nsc); end
