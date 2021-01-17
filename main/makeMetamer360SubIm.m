@@ -19,8 +19,8 @@ fprintf("Angle %f", angle)
 fprintf("Origin %f %f", origin(1), origin(2))
 
 %find coords of subIm to extract
-subImW = 512;
-subImH = 512;
+subImW = 128;
+subImH = 128;
 %This version extracts a sub-image centred on the origin point.
 top = origin(1)-subImH/2;
 bottom = origin(1)+subImH/2 - 1;

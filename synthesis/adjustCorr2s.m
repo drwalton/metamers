@@ -36,7 +36,7 @@ end
 Bx = innerProd(X) / size(X,1);
 Bxy = (X' * Y) / size(X,1);
 By = innerProd(Y) / size(X,1);
-iBy = inv(By);
+iBy = pinv(By);
 
 Current = Bx - (Bxy * iBy * Bxy');
 Cx0 = Cx;
