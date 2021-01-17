@@ -7,21 +7,32 @@
 % This version only generates a metamer for a sub-image around the focal
 % point, allowing it to handle higher-resolution inputs.
 
-function makeMetamer360SubIm(oim, origin, outputFilename, initIm)
+function makeMetamer360SubIm(oim, angle, outputFilename, initIm)
 
 %Adding this for now as otherwise the 
-assert(isequal(size(oim),[1024, 2048]));
 %origin = (size(oim) + 1) ./ 2;
 
+origin = [size(oim, 1)/2, size(oim, 2)/2];
+origin(2) = origin(2) + (angle / 360) * size(oim, 2);
+
+fprintf("Angle %f", angle)
+fprintf("Origin %f %f", origin(1), origin(2))
+
 %find coords of subIm to extract
-subImW = 1024;
-subImH = 1024;
+subImW = 512;
+subImH = 512;
 %This version extracts a sub-image centred on the origin point.
-%subIm = [origin(1)-(subImH/2)+1, origin(1)+(subImH/2), origin(2)-(subImW/2)+1, origin(2)+(subImW/2)];
+top = origin(1)-subImH/2;
+bottom = origin(1)+subImH/2 - 1;
+left = origin(2)-subImH/2;
+right = origin(2)+subImH/2 - 1;
+%subIm = oim(top:bottom, left:right);
+%imshow(subIm);
+subIm = [top, bottom, left, right];
 
 %This alternative version centres it horizontally only, just capturing the
 %full vertical extent of the image.
-subIm = [1, 1024,  origin(2)-(subImW/2)+1, origin(2)+(subImW/2)];
+%subIm = [1, 1024,  origin(2)-(subImW/2)+1, origin(2)+(subImW/2)];
 
 subIm = floor(subIm);
 
@@ -38,7 +49,7 @@ opts = metamerOpts(oim,'windowType=radialEquirectangular','scale=0.5', ...
 m = mkImMasks(opts);
 
 % plot windows
-plotWindows(m,opts);
+%plotWindows(m,opts);
 
 % do metamer analysis on original (measure statistics)
 params = metamerAnalysis(subOim,m,opts);
