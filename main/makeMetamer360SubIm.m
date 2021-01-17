@@ -40,6 +40,9 @@ subIm = floor(subIm);
 subOim = oim(subIm(1):subIm(2), subIm(3):subIm(4));
 assert(isequal(size(subOim), [subImH, subImW]));
 
+%Set origin back to real centre
+origin = [size(oim, 1)/2, size(oim, 2)/2];
+
 % set options
 opts = metamerOpts(oim,'windowType=radialEquirectangular','scale=0.5', ...
     'aspect=2', 'nIters=25', strcat('subIm=', mat2str(subIm)), ...
@@ -48,8 +51,9 @@ opts = metamerOpts(oim,'windowType=radialEquirectangular','scale=0.5', ...
 % make windows
 m = mkImMasks(opts);
 
+
 % plot windows
-%plotWindows(m,opts);
+plotWindows(m,opts);
 
 % do metamer analysis on original (measure statistics)
 params = metamerAnalysis(subOim,m,opts);
