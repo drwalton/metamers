@@ -9,6 +9,8 @@ see `contents.m` for what's in here and `metamerTest.m` for testing basic functi
 
 written in matlab a long time ago, could probably be greatly improved or enhanced using more modern tools!
 
+This fork of the original metamers repository adds the ability to generate metamers for 360 images in equirectangular format. These can be generated using makeMetamer360SubIm.m in main/. Note that this implementation just processes the 180 degree horizontal region around the fixation point to speed things up (as of early 2021 most headsets have FoVs significantly smaller than 180 degrees).
+
 ## Setup
 
 This requires the matlab pyramid tools toolbox from https://github.com/LabForComputationalVision/matlabPyrTools. Before running any of this code make sure to add the matlabPyrTools and this main metamers folder and their subfolders to your matlab PATH (right click on the folders and select "Add to Path -> Selected Folders and Subfolders").
